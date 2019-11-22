@@ -30,7 +30,11 @@ func main() {
     log.Println("INDEX_NAME", *INDEX_NAME)
     log.Println("COLUMNS", *COLUMNS)
     log.Println("BATCH_SIZE", *BATCH_SIZE)
+    log.Println("QUERY_INTERVAL", *QUERY_INTERVAL)
+    log.Println("FILTER_COLUMNS", *FILTER_COLUMNS)
     log.Println("PROXY_URL", *PROXY_URL)
+    log.Println("TIMEOUT", *TIMEOUT)
+    log.Println("OUTFILE", *OUTFILE)
     log.Println("=============================================")
 
     if *INDEX_NAME == "" {

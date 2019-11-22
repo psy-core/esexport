@@ -35,19 +35,20 @@ func main() {
 
     if *INDEX_NAME == "" {
         log.Println("index name must not be empty")
-        return
+        os.Exit(-1)
     }
 
     es.Init(*TIMEOUT, *PROXY_URL)
     fd, err := os.OpenFile(*OUTFILE, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
     if err != nil {
         log.Println("open file ", *OUTFILE, "error:", err.Error())
-        return
+        os.Exit(-1)
     }
     defer func() {
         err = fd.Close()
         if err != nil {
             log.Println("close file ", *OUTFILE, "error:", err.Error())
+            os.Exit(-1)
         }
     }()
 
@@ -94,7 +95,7 @@ func main() {
         termFilters, nil, action)
     if err != nil {
         log.Println("walk es error:", err.Error())
-        return
+        os.Exit(-1)
     }
 
     log.Println("walk complete, total count", count)

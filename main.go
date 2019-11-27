@@ -83,7 +83,10 @@ func main() {
                 default:
                     value = fmt.Sprintf("%v", hit.Source[c])
                 }
-                _, err = fd.WriteString(fmt.Sprintf("%v: %v\t", c, value))
+                if value == "" {
+                    value = "<nil>"
+                }
+                _, err = fd.WriteString(fmt.Sprintf("%v\t", value))
                 if err != nil {
                     log.Println("write string to file ", *OUTFILE, "error:", err.Error())
                 }

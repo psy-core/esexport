@@ -55,6 +55,10 @@ type WildcardCondition struct {
     Wildcard map[string]string `json:"wildcard"`
 }
 
+type RegexpCondition struct {
+    Regexp map[string]string `json:"regexp"`
+}
+
 type AllCondition struct {
     All interface{} `json:"match_all"`
 }
@@ -77,13 +81,13 @@ func newHttpClient(timeout int64, proxyUrl string) *http.Client {
 }
 
 func WalkEs(esURL, indexName string, batchSize int64, minQueryInterval time.Duration,
-    termFilter map[string]string, wildcardFilter map[string]string,
+    termFilter map[string]string, wildcardFilter map[string]string, regexpFilter map[string]string,
     action func(hits []Hit)) (int64, error) {
     if esURL == "" || indexName == "" || batchSize <= 0 {
         return 0, errors.New("invalid parameters")
     }
     count := int64(0)
-    scrollId, audioHit, err := firstPassES(esURL+"/"+indexName, batchSize, termFilter, wildcardFilter)
+    scrollId, audioHit, err := firstPassES(esURL+"/"+indexName, batchSize, termFilter, wildcardFilter, regexpFilter)
     for {
         if err != nil {
             return 0, err
@@ -104,7 +108,7 @@ func WalkEs(esURL, indexName string, batchSize int64, minQueryInterval time.Dura
 }
 
 func firstPassES(indexURL string, batchSize int64,
-    termFilter map[string]string, wildcardFilter map[string]string) (string, []Hit, error) {
+    termFilter, wildcardFilter, regexpFilter map[string]string) (string, []Hit, error) {
 
     mustItems := make([]interface{}, 0, 1)
 
@@ -118,6 +122,13 @@ func firstPassES(indexURL string, batchSize int64,
     if wildcardFilter != nil && len(wildcardFilter) > 0 {
         for k, v := range wildcardFilter {
             term := WildcardCondition{Wildcard: map[string]string{k: v}}
+            mustItems = append(mustItems, term)
+        }
+    }
+
+    if regexpFilter != nil && len(regexpFilter) > 0 {
+        for k, v := range regexpFilter {
+            term := RegexpCondition{Regexp: map[string]string{k: v}}
             mustItems = append(mustItems, term)
         }
     }
